@@ -33,16 +33,23 @@ Create Table Groups
 	[specialty_code] int Foreign Key References Specialties(id) not null,
 ) 
 
+Create Table Positions_of_lectureres
+(
+	[id] int Primary Key Identity(1,1) not null,
+	[name_position] nvarchar(50) not null
+)
+
 Create Table Lecturers 
 (
     [id] int Primary Key Identity(1,1) not null,
 	[lecturer_name] nvarchar(20) not null,
 	[lecturer_surname] nvarchar(20) not null,
 	[lecturer_second_name] nvarchar(20) not null,
-	[phone_number] int not null,
-	[position] nvarchar(10) not null,
-	[id_curator_of_group] int not null,
+	[login] nvarchar(50) not null,
 	[password] nvarchar(max) not null,
+	[phone_number] int not null,
+	[position_id] int Foreign Key References Positions_of_lectureres(id) not null,
+	[id_curator_of_group] int not null,
 	[cathedra_id] int Foreign Key References Ñathedra(id) not null
 ) 
 
@@ -86,4 +93,13 @@ Create Table Students_at_practice
 	[places_for_practice_id] int Foreign Key References Places_for_practice(id) not null,
 	[student_id] int Foreign Key References Students(student_record_book_id) not null,
 	[curator_Of_practice_id] int Foreign Key References Lecturers(id) not null
+)
+
+--Table for the separation of user rights
+
+Create Table Admins 
+(
+	[id] int Primary Key Identity(1,1) not null,
+	[login] nvarchar(50) not null,
+	[password] nvarchar(max) not null
 )
