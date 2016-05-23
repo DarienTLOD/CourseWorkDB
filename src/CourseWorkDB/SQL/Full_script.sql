@@ -4,7 +4,7 @@ Go
 use CourseWorkDB;
 
 --Tables that associated with university
---
+
 Create Table Faculty
 (
     [id] int Primary Key Identity(1,1) not null,
