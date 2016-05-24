@@ -7,7 +7,7 @@ using Microsoft.AspNet.Mvc;
 namespace CourseWorkDB.Controllers
 {
     public class HomeController : Controller
-    {
+    {   
         public IActionResult Index()
         {
             return View();

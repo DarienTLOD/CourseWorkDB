@@ -1,4 +1,4 @@
-Create Database CourseWorkDB;
+Create Database CourseWorkDb;
 Go
 
 use CourseWorkDB;
@@ -12,7 +12,7 @@ Create Table Faculty
 	[faculty_name] nvarchar(20) not null,
 ) 
 
-Create Table Ñathedra
+Create Table Cathedra
 (
     [id] int Primary Key Identity(1,1) not null,
 	[cathedra_name] nvarchar(20) not null,
@@ -24,7 +24,7 @@ Create Table Specialties
 (
     [id] int Primary Key not null,
 	[specialty_name] nvarchar(20) not null,
-	[cathedra_id] int Foreign Key References Ñathedra(id) not null
+	[cathedra_id] int Foreign Key References Cathedra(id) not null
 ) 
 
 Create Table Groups
@@ -50,7 +50,7 @@ Create Table Lecturers
 	[phone_number] int not null,
 	[position_id] int Foreign Key References Positions_of_lectureres(id) not null,
 	[id_curator_of_group] int not null,
-	[cathedra_id] int Foreign Key References Ñathedra(id) not null
+	[cathedra_id] int Foreign Key References Cathedra(id) not null
 ) 
 
 Create Table Students
@@ -103,3 +103,26 @@ Create Table Admins
 	[login] nvarchar(50) not null,
 	[password] nvarchar(max) not null
 )
+
+--Login and user creation
+If not Exists (select name from master.dbo.syslogins 
+               where name = 'CourseworkDBUser')
+Begin
+    Create Login CourseworkDBUser With Password = '1234567890';
+End
+Create User CourseworkDBUser For Login CourseworkDBUser;
+
+--Grant permissions to created user
+Grant Insert, Select, Update, Delete On Faculty To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Cathedra To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Specialties To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Groups To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Positions_of_lectureres To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Lecturers To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Students To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Companies To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Places_for_practice To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Students_at_practice To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Admins To CourseworkDBUser;
+Grant Execute To CourseworkDBUser;
+Go
