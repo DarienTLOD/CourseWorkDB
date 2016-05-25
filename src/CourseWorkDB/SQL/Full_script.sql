@@ -22,15 +22,17 @@ Create Table Cathedrals
 
 Create Table Specialties
 (
-    [Id] int Primary Key not null,
+    [Id] int Primary Key Identity(1,1) not null,
+    [Specialty_Code] int Primary Key not null,
 	[Specialty_Name] nvarchar(20) not null,
 	[Cathedra_Id] int Foreign Key References Cathedrals(Id) not null
 ) 
 
 Create Table Groups
 (
-    [Id] int Primary Key not null,
-	[Specialty_Code] int Foreign Key References Specialties(Id) not null,
+    [Id] int Primary Key Primary Key Identity(1,1) not null,
+	[Group_Code] int not null,
+	[Specialty_Id] int Foreign Key References Specialties(Id) not null
 ) 
 
 Create Table Positions_Of_Lectureres
@@ -117,7 +119,7 @@ Grant Insert, Select, Update, Delete On Faculties To CourseworkDBUser;
 Grant Insert, Select, Update, Delete On Cathedrals To CourseworkDBUser;
 Grant Insert, Select, Update, Delete On Specialties To CourseworkDBUser;
 Grant Insert, Select, Update, Delete On Groups To CourseworkDBUser;
-Grant Insert, Select, Update, Delete On Positions_Ff_Lectureres To CourseworkDBUser;
+Grant Insert, Select, Update, Delete On Positions_Of_Lectureres To CourseworkDBUser;
 Grant Insert, Select, Update, Delete On Lecturers To CourseworkDBUser;
 Grant Insert, Select, Update, Delete On Students To CourseworkDBUser;
 Grant Insert, Select, Update, Delete On Companies To CourseworkDBUser;
@@ -173,6 +175,7 @@ Return
 Go
 
 -----------End Faculty---------------
+
 ------------Cathedrals---------------
 
 Create Procedure CreateCathedra
@@ -219,3 +222,108 @@ Return
 Go
 
 --------End Cathedrals---------------
+
+------------Specialties---------------
+
+Create Function GetCathedralsIdByName
+(
+ @Cathedra_Name nvarchar(20)
+)	
+Returns int
+As 
+begin
+	DECLARE @result  int
+	Select @result =  Id From Cathedrals Where Cathedrals.Cathedra_Name = @Cathedra_Name
+	Return @result
+end
+Go
+
+Create Procedure CreateSpecialty
+    @Specialty_Code int, 
+    @Specialty_Name nvarchar(20),
+	@Cathedra_Name nvarchar(20)
+As
+Begin
+    Set Nocount On;
+    Insert Into Specialties Values (@Specialty_Code, @Specialty_Name, (select dbo.GetCathedralsIdByName(@Cathedra_Name)));
+End
+Go
+
+Create Procedure UpdateSpecialty
+	@Specialty_Code int, 
+	@Specialty_Name nvarchar(20),
+	@Cathedra_Name nvarchar(20)
+As
+Begin
+    Set Nocount On;
+    Update Specialties
+    Set Specialty_Name = @Specialty_Name, Cathedra_Id = (select dbo.GetCathedralsIdByName(@Cathedra_Name))
+    Where Id = @Specialty_Code;	
+End
+Go	
+
+Create Procedure DeleteSpecialty
+   @Specialty_Id int
+As
+Begin
+    Set Nocount On;
+    Delete From Specialties Where Id = @Specialty_Id;  
+End
+Go
+
+Create Function GetSpecialties()	
+Returns Table
+As 
+Return
+(
+    Select Id, Specialty_Name, (Select Cathedra_Name From Cathedrals where Cathedrals.Id = Specialties.Id) as Cathedra_Name  From Specialties
+)
+Go
+
+--------End Specialties---------------
+
+--------------Groups------------------
+
+Create Procedure CreateGroup
+    @Group_Code int, 
+    @Specialty_Id int
+As
+Begin
+    Set Nocount On;
+    Insert Into Groups Values (@Group_Code, @Specialty_Id);
+End
+Go
+
+Create Procedure UpdateGroup
+	@Group_Id int,
+	@Group_Code int, 
+    @Specialty_Id int
+As
+Begin
+    Set Nocount On;
+    Update Groups
+    Set Group_Code = @Group_Code, Specialty_Id = @Specialty_Id
+    Where Id = @Group_Id;	
+End
+Go	
+
+Create Procedure DeleteGroup
+   @Group_Id int
+As
+Begin
+    Set Nocount On;
+    Delete From Groups Where Id = @Group_Id;  
+End
+Go
+
+Create Function GetGroups()	
+Returns Table
+As 
+Return
+(
+    Select Id, Group_Code, (Select Specialties.Specialty_Code From Specialties where Groups.Specialty_Id = Specialties.Id) as Specialty_Code  From Groups
+)
+Go
+
+--------End Groups---------------
+
